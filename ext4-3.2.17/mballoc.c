@@ -2020,19 +2020,25 @@ ext4_mb_regular_allocator(struct ext4_allocation_context *ac)
 repeat:
 	for (; cr < 4 && ac->ac_status == AC_STATUS_CONTINUE; cr++) {
 		ac->ac_criteria = cr;
+		mb_debug(1, "mballoc: loop cr: %d\n", cr);
 		/*
 		 * searching for the right group start
 		 * from the goal value specified
 		 */
 		group = ac->ac_g_ex.fe_group;
+		mb_debug(1, "mballoc: starting group: %u\n", group);
 
 		for (i = 0; i < ngroups; group++, i++) {
+            mb_debug(1, "mballoc: current group(i): %u\n", i);
 			if (group == ngroups)
 				group = 0;
 
 			/* This now checks without needing the buddy page */
-			if (!ext4_mb_good_group(ac, group, cr))
+			if (!ext4_mb_good_group(ac, group, cr)) {
+                mb_debug(1, "mballoc: group %u is BAD.\n", i);
 				continue;
+            }
+            mb_debug(1, "mballoc: group %u is GOOD.\n", i);
 
 			err = ext4_mb_load_buddy(sb, group, &e4b);
 			if (err)
@@ -2050,20 +2056,27 @@ repeat:
 				continue;
 			}
 
+            mb_debug(1, "mballoc: start scanning group %u\n", i);
 			ac->ac_groups_scanned++;
-			if (cr == 0)
+			if (cr == 0) {
+                mb_debug(1, "mballoc: Calling ext4_mb_simple_scan_group() ");
 				ext4_mb_simple_scan_group(ac, &e4b);
-			else if (cr == 1 && sbi->s_stripe &&
-					!(ac->ac_g_ex.fe_len % sbi->s_stripe))
+            } else if (cr == 1 && sbi->s_stripe &&
+					!(ac->ac_g_ex.fe_len % sbi->s_stripe)) {
+                mb_debug(1, "mballoc: Calling ext4_mb_scan_aligned() ");
 				ext4_mb_scan_aligned(ac, &e4b);
-			else
+            } else {
+                mb_debug(1, "mballoc: Calling ext4_mb_complex_scan_group()");
 				ext4_mb_complex_scan_group(ac, &e4b);
+            }
 
 			ext4_unlock_group(sb, group);
 			ext4_mb_unload_buddy(&e4b);
 
-			if (ac->ac_status != AC_STATUS_CONTINUE)
+			if (ac->ac_status != AC_STATUS_CONTINUE) {
+                mb_debug(1, "mballoc: !AC_STATUS_CONTINUE");
 				break;
+            }
 		}
 	}
 
@@ -2073,7 +2086,8 @@ repeat:
 		 * We've been searching too long. Let's try to allocate
 		 * the best chunk we've found so far
 		 */
-
+        
+        mb_debug(1, "mballoc: Calling ext4_mb_try_best_found()");
 		ext4_mb_try_best_found(ac, &e4b);
 		if (ac->ac_status != AC_STATUS_FOUND) {
 			/*

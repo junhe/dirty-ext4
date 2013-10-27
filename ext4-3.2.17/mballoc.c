@@ -2035,16 +2035,16 @@ repeat:
 		mb_debug(1, "mballoc: starting group: %u\n", group);
 
 		for (i = 0; i < ngroups; group++, i++) {
-            mb_debug(1, "mballoc: current group(i): %u\n", i);
+            mb_debug(1, "mballoc: current group: %u\n", group);
 			if (group == ngroups)
 				group = 0;
 
 			/* This now checks without needing the buddy page */
 			if (!ext4_mb_good_group(ac, group, cr)) {
-                mb_debug(1, "mballoc: group %u is BAD.\n", i);
+                mb_debug(1, "mballoc: group %u is BAD.\n", group);
 				continue;
             }
-            mb_debug(1, "mballoc: group %u is GOOD.\n", i);
+            mb_debug(1, "mballoc: group %u is GOOD.\n", group);
 
 			err = ext4_mb_load_buddy(sb, group, &e4b);
 			if (err)
@@ -2062,7 +2062,7 @@ repeat:
 				continue;
 			}
 
-            mb_debug(1, "mballoc: start scanning group %u\n", i);
+            mb_debug(1, "mballoc: start scanning group %u\n", group);
 			ac->ac_groups_scanned++;
 			if (cr == 0) {
                 mb_debug(1, "mballoc: Calling ext4_mb_simple_scan_group() ");

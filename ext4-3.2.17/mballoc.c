@@ -1965,6 +1965,12 @@ ext4_mb_regular_allocator(struct ext4_allocation_context *ac)
 	struct super_block *sb;
 	struct ext4_buddy e4b;
 
+    
+    mb_debug(1, "(in reg_alloc) EXT4_MB_HINT_NOPREALLOC:%x\n EXT4_MB_STREAM_ALLOC:%x\n EXT4_MB_HINT_GROUP_ALLOC:%x\n",
+                ac->ac_flags & EXT4_MB_HINT_NOPREALLOC,
+                ac->ac_flags & EXT4_MB_STREAM_ALLOC,
+                ac->ac_flags & EXT4_MB_HINT_GROUP_ALLOC);
+
 	sb = ac->ac_sb;
 	sbi = EXT4_SB(sb);
 	ngroups = ext4_get_groups_count(sb);
@@ -3999,6 +4005,12 @@ static void ext4_mb_group_or_file(struct ext4_allocation_context *ac)
 	int bsbits = ac->ac_sb->s_blocksize_bits;
 	loff_t size, isize;
 
+    mb_debug(1, "EXT4_MB_HINT_NOPREALLOC:%x\n EXT4_MB_STREAM_ALLOC:%x\n EXT4_MB_HINT_GROUP_ALLOC:%x\n",
+                ac->ac_flags & EXT4_MB_HINT_NOPREALLOC,
+                ac->ac_flags & EXT4_MB_STREAM_ALLOC,
+                ac->ac_flags & EXT4_MB_HINT_GROUP_ALLOC);
+
+
 	if (!(ac->ac_flags & EXT4_MB_HINT_DATA))
 		return;
 
@@ -4008,6 +4020,8 @@ static void ext4_mb_group_or_file(struct ext4_allocation_context *ac)
 	size = ac->ac_o_ex.fe_logical + EXT4_C2B(sbi, ac->ac_o_ex.fe_len);
 	isize = (i_size_read(ac->ac_inode) + ac->ac_sb->s_blocksize - 1)
 		>> bsbits;
+    
+	mb_debug(1, "size: %lld, isize: %lld\n", size, isize);
 
 	if ((size == isize) &&
 	    !ext4_fs_is_busy(sbi) &&
@@ -4038,6 +4052,7 @@ static void ext4_mb_group_or_file(struct ext4_allocation_context *ac)
 
 	/* we're going to use group allocation */
 	ac->ac_flags |= EXT4_MB_HINT_GROUP_ALLOC;
+    mb_debug(1, "ac->ac_flags is set EXT4_MB_HINT_GROUP_ALLOC");
 
 	/* serialize all allocations in the group */
 	mutex_lock(&ac->ac_lg->lg_mutex);

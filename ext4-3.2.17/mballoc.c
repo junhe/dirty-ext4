@@ -2988,6 +2988,20 @@ ext4_mb_normalize_request(struct ext4_allocation_context *ac,
 		size = 512 * 1024;
 	} else if (size <= 1024 * 1024) {
 		size = 1024 * 1024;
+	} else if (size <= 2*1024 * 1024) {
+		size = 2*1024 * 1024;
+	} else if (size <= 3*1024 * 1024) {
+		size = 3*1024 * 1024;
+	} else if (size <= 4*1024 * 1024) {
+		size = 4*1024 * 1024;
+	} else if (size <= 5*1024 * 1024) {
+		size = 5*1024 * 1024;
+	} else if (size <= 6*1024 * 1024) {
+		size = 6*1024 * 1024;
+	} else if (size <= 7*1024 * 1024) {
+		size = 7*1024 * 1024;
+	} else if (size <= 8*1024 * 1024) {
+		size = 8*1024 * 1024;
 	} else if (NRL_CHECK_SIZE(size, 4 * 1024 * 1024, max, 2 * 1024)) {
 		start_off = ((loff_t)ac->ac_o_ex.fe_logical >>
 						(21 - bsbits)) << 21;
